@@ -19,5 +19,8 @@
     "better-sqlite3": "^12.11.1",
     "fastify": "^5.12.8",
     "qrcode": "^1.5.4"
+  },
+  "overrides": {
+    "content-disposition": "2.0.1"
   }
 }

@@ -61,7 +61,8 @@ Edite o `.env`. `PIX_CHAVE`, `PIX_NOME` e `PIX_CIDADE` são obrigatórios.
 | `IMAGENS` | — | Caminhos em `public/`, separados por vírgula |
 | `META_CENTAVOS` | — | Meta em centavos (`49999` = R$ 499,99) |
 | `MAX_CONTRIBUICAO_CENTAVOS` | — | Teto por contribuição |
-| `RATE_LIMIT_POR_MINUTO` | `10` | Limite de requisições por minuto |
+| `RATE_LIMIT_POR_MINUTO` | `10` | Limite de requisições por minuto, por IP |
+| `TRUST_PROXY` | `false` | `true` só atrás de túnel/proxy confiável: faz o rate limit contar por IP real |
 | `PIX_CHAVE` | — | CPF/CNPJ só números, telefone `+55DDDNUMERO`, e-mail minúsculo ou UUID |
 | `PIX_NOME` | — | Recebedor, até 25 caracteres (acentos removidos) |
 | `PIX_CIDADE` | — | Cidade, até 15 caracteres |
@@ -81,6 +82,36 @@ npm test    # testes de Pix, API e extração do OCR
 ```
 
 Os amigos acessam pela rede local em `http://IP-DA-MAQUINA:3000`.
+
+## Publicar na internet (túnel)
+
+Rodando na sua máquina, exponha com [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/)
+— ao contrário do ngrok gratuito, não exibe página intermediária:
+
+```bash
+echo "TRUST_PROXY=true" >> .env   # rate limit por IP real
+npm start
+# em outro terminal:
+cloudflared tunnel --url http://localhost:3000
+```
+
+Ele imprime a URL `https://<aleatorio>.trycloudflare.com`, que muda a cada
+reinício. O HTTPS do túnel devolve `crypto.subtle` e `navigator.clipboard`, que
+não existem no acesso por `http://` na rede local.
+
+**Antes de divulgar:** abra a URL no celular e escaneie o QR Code com o app do
+banco para confirmar nome e chave. Qualquer pessoa com o link pode registrar
+contribuições — não há login nem verificação bancária. Mantenha o link só no
+grupo e derrube o túnel quando o evento acabar.
+
+### Prévia de link (Open Graph)
+
+`GET /` injeta as tags Open Graph com a URL absoluta tirada do próprio pedido
+(`x-forwarded-proto` / `x-forwarded-host`), então a prévia funciona com a URL
+aleatória do túnel sem configuração. O WhatsApp exibe **uma** imagem: a primeira
+de `IMAGENS` que exista em `public/`. A descrição traz a meta, não o total
+arrecadado, porque a prévia fica em cache e um total congelado enganaria quem
+abrisse o link depois.
 
 ## API
 
@@ -116,11 +147,12 @@ calculados no servidor.
 ├── src/
 │   ├── server.js          # Fastify, estáticos, rate limit, handler de erro
 │   ├── config.js          # Leitura e validação do .env
+│   ├── og.js              # Tags Open Graph da prévia de link
 │   ├── pix.js             # BR Code estático
 │   ├── db/                # connection.js, schema.sql, seed.js
 │   └── routes/            # vaquinha.js, contribuicoes.js
 ├── public/                # index.html, styles.css, app.js, ocr.js, sha256.js, images/
-├── test/                  # api.test.js, ocr.test.js, pix.test.js
+├── test/                  # api, ocr, pix, og, trust-proxy
 ├── docs/ESPECIFICACAO.md  # Documento de projeto do MVP
 └── data/                  # SQLite gerado em execução (não versionado)
 ```
@@ -158,6 +190,11 @@ implementação divergiu nos pontos abaixo:
   o comprovante. Falhando o OCR, o valor pode ser digitado.
 - Em `http://` na rede local não há `crypto.subtle` nem `navigator.clipboard`;
   a página usa SHA-256 em JS puro (`public/sha256.js`) e cópia via `execCommand`.
+- `/` é servida por rota própria (`@fastify/static` com `index: false`) para
+  receber as tags Open Graph; `/index.html` redireciona 301 para `/`.
+- O `package.json` fixa `content-disposition` em `2.0.1` via `overrides`: a
+  `3.0.0` é ESM-only e o `@fastify/static@10` ainda a carrega com `require()`,
+  o que quebra com `ERR_REQUIRE_ESM` em runtimes que não toleram isso.
 
 ## Status
 
