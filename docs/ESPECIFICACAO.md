@@ -1,4 +1,7 @@
-# Vaquinha Pix — MVP para evento entre amigos
+# Especificação — Vaquinha Pix (MVP)
+
+> Documento de projeto do MVP. Para instalação e uso, veja o [README](../README.md).
+> A implementação divergiu da spec em alguns pontos; as diferenças estão listadas no README.
 
 ## 1. Visão geral
 
@@ -301,31 +304,3 @@ As bibliotecas de OCR/PDF podem ser servidas como dependências frontend empacot
 - **SQLite no lugar de banco gerenciado:** adequado para uma campanha pequena e poucas gravações simultâneas.
 - **Polling no lugar de WebSocket:** simples e suficiente para progresso quase em tempo real.
 - **Sem painel administrativo no MVP:** dados do produto e chave Pix são configurados antes do evento.
-
-## 16. Como rodar (implementação atual)
-
-Vaquinha configurada: **Jogo de dardos + proteção de parede em EVA**, meta **R$ 499,99**.
-
-```bash
-npm install
-cp .env.example .env     # preencha PIX_CHAVE, PIX_NOME e PIX_CIDADE
-npm start                # http://localhost:3000
-npm test                 # testes de Pix, API e extração do OCR
-```
-
-- Os amigos acessam pela rede local em `http://IP-DA-MAQUINA:3000` (`HOST=0.0.0.0`).
-- O QR Code e o Copia e Cola são gerados no servidor a partir da chave Pix: BR Code estático, sem valor fixo.
-- Depois de configurar, **escaneie o QR com o seu app do banco** para conferir nome e chave antes de divulgar.
-- Mudou o `.env`? Reinicie o servidor. A vaquinha é atualizada e as contribuições continuam no banco.
-- O banco fica em `data/vaquinha.sqlite`. Para backup com o servidor rodando: `sqlite3 data/vaquinha.sqlite ".backup data/backup.sqlite"`.
-
-Diferenças em relação à spec acima:
-
-- A coluna `imagem_url` virou `imagens` (array JSON), para mostrar as duas fotos. A API devolve `imagens` e também `maxContribuicaoCentavos`.
-- As variáveis de ambiente são lidas com `process.loadEnvFile()` do Node, sem `dotenv`.
-- Tesseract.js `5.1.1` e PDF.js `4.10.38` vêm do jsDelivr. O celular precisa de internet para ler o comprovante. Se o OCR falhar, ainda dá para digitar o valor.
-- Por `http://` na rede local não há `crypto.subtle` nem `navigator.clipboard`. Nesse caso a página usa SHA-256 em JS puro (`public/sha256.js`) e cópia via `execCommand`.
-
----
-
-**Status:** MVP implementado. Testado localmente: API, persistência, OCR de PNG e PDF no Chrome e bloqueio de comprovante duplicado.
