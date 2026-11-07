@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14201a">
+  <title>Vaquinha dos Dardos</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <main class="pagina">
+    <header class="cabecalho">
+      <p class="selo">Vaquinha entre amigos</p>
+      <h1 id="titulo">Carregando…</h1>
+      <p id="descricao" class="descricao"></p>
+    </header>
+
+    <section class="galeria" id="galeria" aria-label="Fotos do produto"></section>
+
+    <section class="cartao meta" aria-labelledby="meta-titulo">
+      <h2 id="meta-titulo" class="sr-only">Progresso</h2>
+      <div class="meta-numeros">
+        <div>
+          <span class="rotulo">Arrecadado</span>
+          <strong id="total" class="valor-grande">R$ 0,00</strong>
+        </div>
+        <div class="direita">
+          <span class="rotulo">Meta</span>
+          <strong id="meta">—</strong>
+        </div>
+      </div>
+      <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barra">
+        <div class="barra-preenchida" id="barra-preenchida"></div>
+      </div>
+      <p class="meta-rodape">
+        <span id="percentual">0%</span>
+        <span id="faltam"></span>
+      </p>
+      <p id="status-conexao" class="aviso-conexao" hidden>Sem conexão com o servidor. Tentando de novo…</p>
+    </section>
+
+    <section class="cartao" aria-labelledby="pix-titulo">
+      <h2 id="pix-titulo"><span class="passo">1</span> Faça o Pix</h2>
+      <p class="dica">Escaneie o QR Code ou copie o código no app do banco. Qualquer valor ajuda.</p>
+      <div class="pix">
+        <img id="qr" class="qr" src="/api/pix/qr.svg" alt="QR Code Pix" width="220" height="220">
+        <p class="chave">Chave: <code id="chave">—</code></p>
+        <button type="button" id="copiar" class="botao secundario">Copiar Pix Copia e Cola</button>
+        <p id="copiado" class="ok" role="status" hidden>Código copiado!</p>
+      </div>
+    </section>
+
+    <section class="cartao" aria-labelledby="comp-titulo">
+      <h2 id="comp-titulo"><span class="passo">2</span> Envie o comprovante</h2>
+
+      <label class="arquivo" for="arquivo">
+        <input type="file" id="arquivo" accept="image/jpeg,image/png,application/pdf">
+        <span class="arquivo-botao">Escolher JPG, PNG ou PDF</span>
+        <span id="arquivo-nome" class="arquivo-nome">Nenhum arquivo</span>
+      </label>
+
+      <div id="pagina-pdf" class="campo" hidden>
+        <label for="pagina">Página do PDF</label>
+        <select id="pagina"></select>
+      </div>
+
+      <div id="ocr-status" class="ocr-status" role="status" hidden>
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="ocr-texto">Lendo comprovante…</span>
+      </div>
+
+      <form id="form" class="form" hidden novalidate>
+        <h3><span class="passo">3</span> Confira e registre</h3>
+        <div class="campo">
+          <label for="valor">Valor pago (R$)</label>
+          <input id="valor" inputmode="decimal" autocomplete="off" placeholder="0,00" required>
+          <small id="valor-dica" class="dica"></small>
+        </div>
+        <div class="campo">
+          <label for="nome">Seu nome <span class="opcional">(opcional)</span></label>
+          <input id="nome" maxlength="60" autocomplete="given-name" placeholder="Como os amigos te chamam">
+        </div>
+        <div class="campo">
+          <label for="e2e">Identificador da transação <span class="opcional">(opcional)</span></label>
+          <input id="e2e" maxlength="32" autocomplete="off" spellcheck="false" placeholder="E12345678…">
+          <small class="dica">Começa com “E” e tem 32 caracteres. Ajuda a evitar registro em dobro.</small>
+        </div>
+        <button type="submit" id="enviar" class="botao">Registrar minha contribuição</button>
+      </form>
+
+      <p id="mensagem" class="mensagem" role="alert" hidden></p>
+    </section>
+
+    <footer class="rodape">
+      O total é <strong>declarado pelos participantes</strong> a partir dos comprovantes.
+      Não há conferência bancária automática. Mas eu vou ver os valores no pix seus malandros.
+    </footer>
+  </main>
+</body>
+</html>

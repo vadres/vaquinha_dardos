@@ -1,0 +1,23 @@
+{
+  "name": "vaquinha-dardos",
+  "version": "1.0.0",
+  "description": "Vaquinha Pix para o jogo de dardos + proteção de parede em EVA",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^10.1.10",
+    "better-sqlite3": "^12.11.1",
+    "fastify": "^5.12.8",
+    "qrcode": "^1.5.4"
+  }
+}
